@@ -1,13 +1,13 @@
+import os
+
 import streamlit as st
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.retrievers.web_research import WebResearchRetriever
+from langchain.text_splitter import (RecursiveCharacterTextSplitter,
+                                     TextSplitter)
 from langchain_community.embeddings import GigaChatEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter, TextSplitter
-
-
-import os
-
+from langchain_openai.chat_models import ChatOpenAI
 
 st.set_page_config(page_title="Interweb Explorer", page_icon="🌐")
 
@@ -16,24 +16,21 @@ def settings():
 
     # Vectorstore
     import faiss
-    from langchain.vectorstores import FAISS
-    from langchain.embeddings.openai import OpenAIEmbeddings
     # from langchain_community.embeddings.gigachat import GigaChatEmbeddings
     from langchain.docstore import InMemoryDocstore
+    from langchain.embeddings.openai import OpenAIEmbeddings
+    from langchain_community.vectorstores.faiss import FAISS
 
-
-    # embeddings_model = OpenAIEmbeddings()
     embeddings_model = GigaChatEmbeddings(
-        base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1",
+        base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1/",
         model="Embeddings",
         verify_ssl_certs=False,
+        one_by_one_mode=False
     )
-    embedding_size = 1536
-    # embedding_size = 128
-    index = faiss.IndexFlatL2(embedding_size)
-    vectorstore_public = FAISS(
-        embeddings_model.embed_query, index, InMemoryDocstore({}), {}
-    )
+    embeddings_model = OpenAIEmbeddings()  
+    embedding_size = 1536  
+    index = faiss.IndexFlatL2(embedding_size)  
+    vectorstore_public = FAISS(embeddings_model.embed_query, index, InMemoryDocstore({}), {})
 
     # LLM
     # from langchain.chat_models import ChatOpenAI
@@ -45,7 +42,7 @@ def settings():
         verbose=True,
         temperature=0,
         model="GigaChat-29b-8k-funcs",
-        base_url="https://wmapi-dev.saluteai-pd.sberdevices.ru/v1/",
+        base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1/",
         verify_ssl_certs=False,
     )
 
@@ -79,7 +76,7 @@ class PrintRetrievalHandler(BaseCallbackHandler):
     def __init__(self, container):
         self.container = container.expander("Context Retrieval")
 
-    def on_retriever_start(self, query: str, **kwargs):
+    def on_retriever_start(self, query, **kwargs):
         self.container.write(f"**Question:** {query}")
 
     def on_retriever_end(self, documents, **kwargs):
