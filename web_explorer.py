@@ -7,7 +7,7 @@ from langchain.retrievers.web_research import WebResearchRetriever
 from langchain.text_splitter import (RecursiveCharacterTextSplitter,
                                      TextSplitter)
 from langchain_community.embeddings import GigaChatEmbeddings
-from langchain_openai.chat_models import ChatOpenAI
+# from langchain_openai.chat_models import ChatOpenAI
 
 st.set_page_config(page_title="Interweb Explorer", page_icon="🌐")
 
@@ -19,18 +19,24 @@ def settings():
     # from langchain_community.embeddings.gigachat import GigaChatEmbeddings
     from langchain.docstore import InMemoryDocstore
     from langchain.embeddings.openai import OpenAIEmbeddings
-    from langchain_community.vectorstores.faiss import FAISS
+    # from langchain_community.vectorstores.faiss import FAISS
+    from langchain_community.vectorstores import Chroma
 
     embeddings_model = GigaChatEmbeddings(
-        base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1/",
+        base_url="https://beta.saluteai.sberdevices.ru/v1",
         model="Embeddings",
         verify_ssl_certs=False,
         one_by_one_mode=False
     )
-    embeddings_model = OpenAIEmbeddings()  
-    embedding_size = 1536  
-    index = faiss.IndexFlatL2(embedding_size)  
-    vectorstore_public = FAISS(embeddings_model.embed_query, index, InMemoryDocstore({}), {})
+    # # embeddings_model = OpenAIEmbeddings()  
+    # embedding_size = 493  
+    # index = faiss.IndexFlatL2(embedding_size)  
+    # vectorstore_public = FAISS(embeddings_model.embed_query, index, InMemoryDocstore({}), {})
+
+    vectorstore_public = Chroma(
+        collection_name="web",
+        embedding_function=embeddings_model,
+    )
 
     # LLM
     # from langchain.chat_models import ChatOpenAI
