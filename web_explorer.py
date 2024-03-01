@@ -1,13 +1,7 @@
-import os
-
 import streamlit as st
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.retrievers.web_research import WebResearchRetriever
-from langchain.text_splitter import (RecursiveCharacterTextSplitter,
-                                     TextSplitter)
-from langchain_community.embeddings import GigaChatEmbeddings
-# from langchain_openai.chat_models import ChatOpenAI
 
 st.set_page_config(page_title="Interweb Explorer", page_icon="🌐")
 
@@ -15,23 +9,16 @@ st.set_page_config(page_title="Interweb Explorer", page_icon="🌐")
 def settings():
 
     # Vectorstore
-    import faiss
-    # from langchain_community.embeddings.gigachat import GigaChatEmbeddings
+    from langchain_community.embeddings.gigachat import GigaChatEmbeddings
     from langchain.docstore import InMemoryDocstore
-    from langchain.embeddings.openai import OpenAIEmbeddings
-    # from langchain_community.vectorstores.faiss import FAISS
     from langchain_community.vectorstores import Chroma
 
     embeddings_model = GigaChatEmbeddings(
-        base_url="https://beta.saluteai.sberdevices.ru/v1",
+        base_url=...,
         model="Embeddings",
         verify_ssl_certs=False,
         one_by_one_mode=False
     )
-    # # embeddings_model = OpenAIEmbeddings()  
-    # embedding_size = 493  
-    # index = faiss.IndexFlatL2(embedding_size)  
-    # vectorstore_public = FAISS(embeddings_model.embed_query, index, InMemoryDocstore({}), {})
 
     vectorstore_public = Chroma(
         collection_name="web",
@@ -39,17 +26,15 @@ def settings():
     )
 
     # LLM
-    # from langchain.chat_models import ChatOpenAI
     from langchain_community.chat_models import GigaChat
 
-    # llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, streaming=True)
     llm = GigaChat(
         streaming=True,
-        verbose=True,
         temperature=0,
-        model="GigaChat-29b-8k-funcs",
+        model=... model with functions ...,
         base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1/",
         verify_ssl_certs=False,
+        profanity_check=False,
     )
 
     # Search
@@ -63,6 +48,7 @@ def settings():
         llm=llm,
         search=search,
         num_search_results=2,
+        verify_ssl=False
     )
 
     return web_retriever, llm
