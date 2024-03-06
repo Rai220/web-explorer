@@ -2,6 +2,7 @@ import streamlit as st
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.retrievers.web_research import WebResearchRetriever
+from langchain.utilities import GoogleSearchAPIWrapper
 
 st.set_page_config(page_title="Interweb Explorer", page_icon="🌐")
 
@@ -14,10 +15,10 @@ def settings():
     from langchain_community.vectorstores import Chroma
 
     embeddings_model = GigaChatEmbeddings(
-        base_url=...,
+        base_url="https://beta.saluteai.sberdevices.ru/v1",
         model="Embeddings",
         verify_ssl_certs=False,
-        one_by_one_mode=False
+        credentials="...",
     )
 
     vectorstore_public = Chroma(
@@ -26,19 +27,17 @@ def settings():
     )
 
     # LLM
+    # from langchain.chat_models import ChatOpenAI
     from langchain_community.chat_models import GigaChat
 
     llm = GigaChat(
         streaming=True,
         temperature=0,
-        model=... model with functions ...,
-        base_url="https://wmapi-ift.saluteai-pd.sberdevices.ru/v1/",
+        ... only model with funcs needed!!! ...
         verify_ssl_certs=False,
-        profanity_check=False,
+        profanity=False,
+        profanity_check=False
     )
-
-    # Search
-    from langchain.utilities import GoogleSearchAPIWrapper
 
     search = GoogleSearchAPIWrapper()
 
@@ -47,7 +46,7 @@ def settings():
         vectorstore=vectorstore_public,
         llm=llm,
         search=search,
-        num_search_results=2,
+        num_search_results=3,
         verify_ssl=False
     )
 
